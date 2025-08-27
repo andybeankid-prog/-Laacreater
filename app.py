@@ -13,6 +13,26 @@ st.set_page_config(
     page_icon="🎯",
     layout="wide",
 )
+import os
+import streamlit as st
+
+# 預設從 secrets 讀取（如果有）
+default_token = st.secrets.get("fb_access_token", "")
+
+st.sidebar.subheader("🔑 Facebook Access Token")
+input_token = st.sidebar.text_input("輸入 Access Token", value=default_token, type="password")
+
+remember_token = st.sidebar.checkbox("記住 Token（寫入 .streamlit/secrets.toml）", value=False)
+
+# 如果勾選記憶，就把 Token 寫到檔案
+if remember_token and input_token:
+    os.makedirs(".streamlit", exist_ok=True)
+    with open(".streamlit/secrets.toml", "w", encoding="utf-8") as f:
+        f.write(f"[secrets]\nfb_access_token = \"{input_token}\"\n")
+    st.sidebar.success("✅ Token 已儲存，下次自動載入")
+
+# 最終使用的 token
+access_token = input_token
 
 # --- CSS for custom styling ---
 st.markdown("""
