@@ -128,12 +128,11 @@ with st.sidebar:
     remember_token = st.checkbox("記住 Token（寫入 .streamlit/secrets.toml）", value=False)
 
     if remember_token and input_token:
-        os.makedirs(".streamlit", exist_ok=True)
-        with open(".streamlit/secrets.toml", "w", encoding="utf-8") as f:
-            f.write(f"[secrets]\nfb_access_token = \"{input_token}\"\n")
-        st.success("✅ Token 已儲存，下次自動載入")
+        st.session_state["saved_token"] = input_token
+        st.success("✅ Token 已暫存，直到本次 Session 結束")
 
-    access_token = input_token
+    # 如果有暫存就自動讀取
+    access_token = st.session_state.get("saved_token", input_token)
 
     st.header("⚙️ 參數設定")
     ad_account_id = st.text_input("廣告帳號 ID (不含 act_)", help="例如：924798139306112")
